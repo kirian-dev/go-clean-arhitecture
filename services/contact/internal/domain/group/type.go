@@ -1,38 +1,62 @@
 package group
 
-import "github.com/go-playground/validator/v10"
+import (
+	"go-clean-architecture/services/contact/internal/domain/group/description"
+	"go-clean-architecture/services/contact/internal/domain/group/name"
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Group struct {
-	ID   string `json:"id" db:"id" validate:"required"`
-	Name string `json:"name" db:"name" validate:"required,length=250"`
+	ID           uuid.UUID
+	Name         name.Name
+	Description  description.Description
+	CreatedAt    time.Time
+	ModifiedAtAt time.Time
+	ContactCount uint64
 }
 
-func NewGroup(id, name string) (*Group, error) {
-	group := &Group{
-		ID:   id,
-		Name: name,
+func NewWithID(id uuid.UUID, name name.Name, description description.Description, createdAt time.Time, modifiedAt time.Time, contactCount uint64) *Group {
+	return &Group{
+		ID:           id,
+		Name:         name,
+		Description:  description,
+		CreatedAt:    createdAt,
+		ModifiedAtAt: modifiedAt,
+		ContactCount: contactCount,
 	}
-	if err := validateGroup(group); err != nil {
-		return nil, err
+}
+func New(name name.Name, description description.Description) *Group {
+	var timeNow = time.Now().UTC()
+	return &Group{
+		ID:           uuid.New(),
+		Name:         name,
+		Description:  description,
+		CreatedAt:    timeNow,
+		ModifiedAtAt: timeNow,
 	}
-
-	return group, nil
+}
+func (g *Group) GetID() uuid.UUID {
+	return g.ID
 }
 
-// GetName returns the name of the group.
-func (g *Group) GetName() string {
+func (g *Group) GetContactCount() uint64 {
+	return g.ContactCount
+}
+
+func (g *Group) GetDescription() description.Description {
+	return g.Description
+}
+
+func (g *Group) GetName() name.Name {
 	return g.Name
 }
 
-// GetID returns the group's ID.
-func (g *Group) GetID() string {
-	return g.ID
+func (g *Group) GetCreatedAt() time.Time {
+	return g.CreatedAt
 }
-func validateGroup(group *Group) error {
-	validate := validator.New()
-	if err := validate.Struct(group); err != nil {
-		return err
-	}
 
-	return nil
+func (g *Group) GetModifiedAt() time.Time {
+	return g.GetModifiedAt()
 }

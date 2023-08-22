@@ -1,12 +1,18 @@
 package contact
 
 import (
+	"errors"
 	"fmt"
+	"go-clean-architecture/pkg/type/email"
+	"go-clean-architecture/pkg/type/gender"
+	phoneNumber "go-clean-architecture/pkg/type/phone"
 	"go-clean-architecture/services/contact/internal/domain/contact/age"
+	"go-clean-architecture/services/contact/internal/domain/contact/firstName"
+	"go-clean-architecture/services/contact/internal/domain/contact/lastName"
+	"go-clean-architecture/services/contact/internal/domain/contact/surname"
 	"time"
 
-	"github.com/go-playground/validator/v10"
-	uuid "github.com/jackc/pgx/pgtype/ext/gofrs-uuid"
+	"github.com/google/uuid"
 )
 
 var (
@@ -14,21 +20,24 @@ var (
 )
 
 type Contact struct {
-	ID          uuid.UUID
-	FirstName   f
-	LastName    string
-	SurnameName string
-	PhoneNumber       phoneNumber.PhoneNumber
+	ID         uuid.UUID
+	CreatedAt  time.Time
+	ModifiedAt time.Time
+
+	FirstName   firstName.FirstName
+	LastName    lastName.LastName
+	SurnameName surname.Surname
+
+	PhoneNumber phoneNumber.PhoneNumber
 	Email       email.Email
-	Age         age.Age
-	Gender      gender.Age
-	CreatedAt   time.Time
-	ModifiedAt  time.Time
+
+	Age    age.Age
+	Gender gender.Gender
 }
 
-func NewWithId(id uuid.UUID, CreatedAt time.Time, ModifiedAt time.Time, firstName, lastName, surnameName string, PhoneNumber       phoneNumber.PhoneNumber) (*Contact, error) {
-	if phoneNumber.isEmpty() {
-		return nil, fmt.Errorf(ErrPhoneNumberRequired)
+func NewWithId(id uuid.UUID, createdAt time.Time, modifiedAt time.Time, firstName firstName.FirstName, lastName lastName.LastName, surnameName surname.Surname, phoneNumber phoneNumber.PhoneNumber, age age.Age) (*Contact, error) {
+	if phoneNumber.IsEmpty() {
+		return nil, fmt.Errorf("%w", ErrPhoneNumberRequired)
 	}
 	if id == uuid.Nil {
 		id = uuid.New()
@@ -38,37 +47,36 @@ func NewWithId(id uuid.UUID, CreatedAt time.Time, ModifiedAt time.Time, firstNam
 		FirstName:   firstName,
 		LastName:    lastName,
 		SurnameName: surnameName,
-		PhoneNumber:       phoneNumber,
-		Age: age.Age,
-		CreatedAt: CreatedAt.UTC(),
-		ModifiedAt: ModifiedAt.UTC(),
-		email: email.Email
-	}
-	if err := validateContact(contact); err != nil {
-		return nil, err
+		PhoneNumber: phoneNumber,
+		Age:         age,
+		CreatedAt:   createdAt.UTC(),
+		ModifiedAt:  modifiedAt.UTC(),
+		Email:       email.Email{},
 	}
 
 	return contact, nil
 }
 
-func New(phoneNumber phoneNumber.PhoneNumber, email: email.Email, firstName firstName.FirstName, lastName lastName.LastName, surnameName) (*Contact, error) {
-	if phoneNumber.isEmpty() {
-		return nil, fmt.Errorf(ErrPhoneNumberRequired)
+func New(phoneNumber phoneNumber.PhoneNumber, firstName firstName.FirstName, lastName lastName.LastName, surnameName surname.Surname, age age.Age, email email.Email) (*Contact, error) {
+	if phoneNumber.IsEmpty() {
+		return nil, fmt.Errorf("%w", ErrPhoneNumberRequired)
 	}
 	var timeNow = time.Now().UTC()
 	return &Contact{
 		PhoneNumber: phoneNumber,
-		CreatedAt: timeNow,
-		ModifiedAt: timeNow,
-	}
+		CreatedAt:   timeNow,
+		ModifiedAt:  timeNow,
+		Age:         age,
+		Email:       email,
+	}, nil
 }
 
-func (c Contact) ID() uuid.UUID {
-	c.ID
+func (c Contact) GetID() uuid.UUID {
+	return c.ID
 }
 
 func (c Contact) Equal(contact Contact) bool {
-	return c.id == contact.id
+	return c.ID == contact.ID
 }
 
 func (c Contact) FullName() string {

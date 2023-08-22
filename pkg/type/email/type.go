@@ -14,11 +14,11 @@ type Email struct {
 
 func New(email string) (Email, error) {
 	if len(email) == 0 {
-		return Email{}, nil
+		return Email{}, errors.New("email cannot be empty")
 	}
 
 	if !regexpEmail.MatchString(strings.ToLower(email)) {
-		return nil, errors.New("Invalid email format")
+		return Email{}, errors.New("invalid email format")
 	}
 
 	return Email{value: email}, nil
