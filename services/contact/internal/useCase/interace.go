@@ -1,4 +1,4 @@
-package storage
+package useCase
 
 import (
 	"go-clean-architecture/services/contact/internal/domain/contact"
@@ -8,31 +8,30 @@ import (
 )
 
 type Contact interface {
-	CreateContact(c ...*contact.Contact) ([]*contact.Contact, error)
-	UpdateContact(c *contact.Contact, id uuid.UUID) (*contact.Contact, error)
-	DeleteContact(ID uuid.UUID) error
-
+	Create(c ...*contact.Contact) ([]*contact.Contact, error)
+	Update(c *contact.Contact, id uuid.UUID) (*contact.Contact, error)
+	Delete(ID uuid.UUID) error
 	ContactReader
 }
 
 type ContactReader interface {
-	GetAllContacts() (*[]contact.Contact, error)
-	GetByIdContact(ID uuid.UUID) (*[]contact.Contact, error)
+	GetAll() (*[]contact.Contact, error)
+	GetById(ID uuid.UUID) (*[]contact.Contact, error)
 }
 
 type Group interface {
-	CreateGroup(g *group.Group) (*group.Group, error)
-	UpdateGroup(g *group.Group, ID uuid.UUID) (*group.Group, error)
-	DeleteGroup(ID uuid.UUID) error
+	Create(g *group.Group) (*group.Group, error)
+	Update(g *group.Group, ID uuid.UUID) (*group.Group, error)
+	Delete(ID uuid.UUID) error
 
 	GroupReader
 	ContactIntoGroup
 }
 
 type GroupReader interface {
-	GetAllGroups() (*[]group.Group, error)
-	GetByIDGroup(ID uuid.UUID) (*[]group.Group, error)
-	CountGroups() (uint64, error)
+	GetAll() (*[]group.Group, error)
+	GetByID(ID uuid.UUID) (*[]group.Group, error)
+	Count() (uint64, error)
 }
 
 type ContactIntoGroup interface {
