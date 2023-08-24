@@ -8,15 +8,15 @@ import (
 )
 
 type Contact interface {
-	Create(c ...*contact.Contact) ([]*contact.Contact, error)
-	Update(c *contact.Contact, id uuid.UUID) (*contact.Contact, error)
+	Create(c ...*contact.Contact) (*[]contact.Contact, error)
+	Update(c *contact.Contact, ID uuid.UUID) (*contact.Contact, error)
 	Delete(ID uuid.UUID) error
 	ContactReader
 }
 
 type ContactReader interface {
 	GetAll() (*[]contact.Contact, error)
-	GetById(ID uuid.UUID) (*[]contact.Contact, error)
+	GetByID(ID uuid.UUID) (*contact.Contact, error)
 }
 
 type Group interface {
@@ -30,7 +30,7 @@ type Group interface {
 
 type GroupReader interface {
 	GetAll() (*[]group.Group, error)
-	GetByID(ID uuid.UUID) (*[]group.Group, error)
+	GetByID(ID uuid.UUID) (*group.Group, error)
 	Count() (uint64, error)
 }
 
